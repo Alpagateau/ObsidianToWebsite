@@ -8,8 +8,8 @@
 
 ##### This is H5
 
-In this paragraph, we can see some **bold** text, some ==highlighted== text, ~~Crossed out~~ text.
-Sometimes, it is easier to show things throught a list like 
+In this paragraph, we can see some **bold**, this is also __bold__ text, some ==highlighted== text, ~~Crossed out~~ text. You can also ~~strike~~
+text. You can also do some combinations, like **this is bold and _italic_** and ***this is both bold and italic***. You also have to consider escaped, this is a star \*. Sometimes, it is easier to show things throught a list like. 
 - One
 - Two
 - Three
