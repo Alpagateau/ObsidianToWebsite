@@ -1,5 +1,5 @@
 
-effectChars = ["*", "#", ">", "=", "-", "_", "~", "\\", "\n"]
+effectChars = ["*", "#", "-", ">", "=", "-", "_", "~", "\\", "\n", "$"]
 
 efx = ["#", "##", "###", "####", "#####", "*", "**", "_", "__", "-", "---", "=="]
 
@@ -24,23 +24,51 @@ class Node:
         if nlist[0] in efx[:5]:
             nNode = Node(nlist[0], [nlist[1]])
             self.children += [nNode]
-            self.addChildren(nlist[2:])
+            return self.addChildren(nlist[2:])
 
         elif nlist[0] == "\n":
             nNode = Node("bl", [""])
             self.children += [nNode]
-            self.addChildren(nlist[1:])
+            return self.addChildren(nlist[1:])
         
         elif nlist[0] == "\n\n":
             nNode = Node("bbl", [""])
             self.children += [nNode]
-            self.addChildren(nlist[1:])
+            return self.addChildren(nlist[1:])
 
         elif nlist[0] == "---":
             nNode = Node("---", [""])
             self.children += [nNode]
-            self.addChildren(nlist[1:])
+            return self.addChildren(nlist[1:])
 
+        elif nlist[0] == ">":
+            nNode = Node(">", [nlist[1]])
+            self.children += [nNode]
+            return self.addChildren(nlist[2:])
+        #to change 
+        elif nlist[0] == "-":
+            if nlist[1][0] == " ":
+                nNode = Node("-")
+                idx = 1
+                temp = []
+                while nlist[idx][0] != "\n":
+                    if idx >= len(nlist):
+                        break
+                    temp += [nlist[idx]]
+                    idx += 1
+                    if idx == len(nlist):
+                        break
+                nNode.addChildren(temp)
+                self.children += [nNode]
+                if len(nlist) > len(temp)+1:
+                    return self.addChildren(nlist[len(temp)+2:])
+                else:
+                    return self.addChildren(nlist[len(temp)+1:])
+        
+        elif nlist[0] == "\\":
+            if len(nlist[1]) == 1:
+                self.children += [nlist[1]]
+                return self.addChildren(nlist[2:])
         #nested 
         elif nlist[0] == "*":
             if self.tag != "*":
@@ -48,9 +76,8 @@ class Node:
                 nlist = nNode.addChildren(nlist[1:])
                 self.children += [nNode]
 
-                self.addChildren(nlist)
+                return self.addChildren(nlist)
             else:
-                print("second star")
                 return nlist[1:]
         
         elif nlist[0] == "**":
@@ -58,19 +85,64 @@ class Node:
                 nNode = Node("**")
                 nlist = nNode.addChildren(nlist[1:])
                 self.children += [nNode]
-                
-                self.addChildren(nlist)
+
+                return self.addChildren(nlist)
             else:
                 return nlist[1:]
 
+        elif nlist[0] == "__":
+            if self.tag != "__":
+                nNode = Node("__")
+                nlist = nNode.addChildren(nlist[1:])
+                self.children += [nNode]
+                 
+                return self.addChildren(nlist)
+            else:
+                return nlist[1:]
+
+        elif nlist[0] == "_":
+            if self.tag != "_":
+                nNode = Node("_")
+                nlist = nNode.addChildren(nlist[1:])
+                self.children += [nNode]
+                 
+                return self.addChildren(nlist)
+            else:
+                return nlist[1:]
+
+        elif nlist[0] == "==":
+            if self.tag != "==":
+                nNode = Node("==")
+                nlist = nNode.addChildren(nlist[1:])
+                self.children += [nNode]
+                 
+                return self.addChildren(nlist)
+            else:
+                return nlist[1:]
+        
+        elif nlist[0] == "~~":
+            if self.tag != "~~":
+                nNode = Node("~~")
+                nlist = nNode.addChildren(nlist[1:])
+                self.children += [nNode]
+                 
+                return self.addChildren(nlist)
+            else:
+                return nlist[1:] 
+        
+        elif nlist[0] == "***":
+            if self.tag != "***":
+                nNode = Node("***")
+                nlist = nNode.addChildren(nlist[1:])
+                self.children += [nNode]
+
+                return self.addChildren(nlist)
+            else:
+                return nlist[1:]
         else:
             self.children += [nlist[0]]
             a = self.addChildren(nlist[1:])
             return a
-        
-
-        
-
 
 def loadFile(path):
     f = open(path, "r")
@@ -113,7 +185,6 @@ def Cleanup(lexed):
                 o+=[buf]
                 buf = ""
             o += [lexed[i]]
-
     return o
 
 def TreeBuilder(cln):
@@ -125,16 +196,15 @@ def TreeBuilder(cln):
     return trunk
 
 def printTree(n, depth = 0):
-    d = "|" + "-" * depth
-    s =   " " * depth
-    print(d + n.tag)
+    print("| " * (depth-1), end="")
+    print("|-" + n.tag)
     for i in range(len(n.children)):
         if type(n.children[i]) == Node:
             printTree(n.children[i], depth+1)
         else:
-            print("|" + s + "|-" + n.children[i])
+            print(("| " * depth) + "|-\"" + n.children[i] + "\"")
 
-lf = loadFile("POC/test.md")
+lf = loadFile("POC/Sample.md")
 l = Lexer(lf)
 c = Cleanup(l)
 w = TreeBuilder(c)
