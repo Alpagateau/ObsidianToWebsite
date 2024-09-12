@@ -22,9 +22,17 @@ class Node:
 
         #not nested first 
         if nlist[0] in efx[:5]:
-            nNode = Node(nlist[0], [nlist[1]])
+            nNode = Node(nlist[0])
+            buff = ""
+            idx = 1
+            while nlist[idx][0] != "\n":
+                buff += nlist[idx]
+                idx += 1
+                if idx == len(nlist):
+                    break
+            nNode.children += [buff]
             self.children += [nNode]
-            return self.addChildren(nlist[2:])
+            return self.addChildren(nlist[idx+1:])
 
         elif nlist[0] == "\n":
             nNode = Node("bl", [""])
@@ -45,6 +53,7 @@ class Node:
             nNode = Node(">", [nlist[1]])
             self.children += [nNode]
             return self.addChildren(nlist[2:])
+        
         #Enclosed, when the first char is diff from the last char
         elif nlist[0] == "-":
             if nlist[1][0] == " ":
@@ -64,6 +73,9 @@ class Node:
                     return self.addChildren(nlist[len(temp)+2:])
                 else:
                     return self.addChildren(nlist[len(temp)+1:])
+            else:
+                self.children += [nlist[0] + nlist[1]]
+                return self.addChildren(nlist[2:])
         
         elif nlist[0] == "[":
             nNode = Node("[]")
@@ -121,9 +133,9 @@ class Node:
                 return self.addChildren(nlist[len(temp)+1:])
  
         elif nlist[0] == "\\":
-            if len(nlist[1]) == 1:
-                self.children += [nlist[1]]
-                return self.addChildren(nlist[2:])
+            nNode = Node("\\")
+            nNode.children = [ nlist[1] ]
+            return self.addChildren(nlist[2:])
         #nested 
         elif nlist[0] == "*":
             if self.tag != "*":
@@ -195,25 +207,33 @@ class Node:
             else:
                 return nlist[1:]
         
+        #Math blocks and code blocks 
         elif nlist[0] == "$":
-            if self.tag != "$":
-                nNode = Node("$")
-                nlist = nNode.addChildren(nlist[1:])
-                self.children += [nNode]
-
-                return self.addChildren(nlist) 
-            else:
-                return nlist[1:]
+            nNode = Node("$")
+            buff = ""
+            idx = 1
+            while nlist[idx] != "$":
+                buff += nlist[idx] 
+                idx += 1
+                if idx >= len(nlist):
+                    break
+            nNode.children += [buff]
+            self.children += [nNode]
+            return self.addChildren(nlist[idx+1:])
+                
          
         elif nlist[0] == "$$":
-            if self.tag != "$$":
-                nNode = Node("$$")
-                nlist = nNode.addChildren(nlist[1:])
-                self.children += [nNode]
-
-                return self.addChildren(nlist)
-            else:
-                return nlist[1:]
+            nNode = Node("$$")
+            buff = ""
+            idx = 1
+            while nlist[idx] != "$$":
+                buff += nlist[idx] 
+                idx += 1
+                if idx >= len(nlist):
+                    break
+            nNode.children += [buff]
+            self.children += [nNode]
+            return self.addChildren(nlist[idx+1:])
         
         elif nlist[0] == "`":
             if self.tag != "`":
@@ -234,7 +254,7 @@ class Node:
                 return self.addChildren(nlist) 
             else:
                 return nlist[1:]
-        
+        #Plain text 
         else:
             self.children += [nlist[0]]
             a = self.addChildren(nlist[1:])
@@ -300,14 +320,14 @@ def printTree(n, depth = 0):
         else:
             print(("| " * depth) + "|-\"" + n.children[i] + "\"")
 
-lf = loadFile("POC/test.md")
+lf = loadFile("RemarkablePOC/index.md")
 l = Lexer(lf)
 c = Cleanup(l)
 w = TreeBuilder(c)
 
 
 #print(l)
-#print(c)
+print(c)
 print("------------")
 printTree(w)
 
