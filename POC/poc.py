@@ -1,11 +1,10 @@
 
 effectChars = ["`","*", "#", "-", ">", "=", "-", "_", "~", "\\", "\n", "$", "[", "]", "(", ")"] 
 
-efx = ["#", "##", "###", "####", "#####", "*", "**", "_", "__", "-", "---", "==", "[", "[[", "]", "]]", "$$", "$", "`", "```"]
+efx = ["#", "##", "###", "####", "#####", "*", "**", "_", "__", "-", "--", "---", "==", "[", "[[", "]", "]]", "$$", "$", "`", "```"]
 
 class Node:
     tag = ""
-    value = ""
     children = []
     
     def __init__(self, t="", c=[]):
@@ -254,6 +253,7 @@ class Node:
                 return self.addChildren(nlist) 
             else:
                 return nlist[1:]
+        
         #Plain text 
         else:
             self.children += [nlist[0]]
@@ -305,20 +305,18 @@ def Cleanup(lexed):
 
 def TreeBuilder(cln):
     global effectChars 
-
     trunk = Node("page")
     trunk.addChildren(cln)
-
     return trunk
 
 def printTree(n, depth = 0):
     print("| " * (depth-1), end="")
-    print("|-" + n.tag)
+    print("|->" + n.tag)
     for i in range(len(n.children)):
         if type(n.children[i]) == Node:
             printTree(n.children[i], depth+1)
         else:
-            print(("| " * depth) + "|-\"" + n.children[i] + "\"")
+            print(("| " * depth) + "|->\"" + n.children[i] + "\"")
 
 lf = loadFile("RemarkablePOC/index.md")
 l = Lexer(lf)
@@ -327,7 +325,7 @@ w = TreeBuilder(c)
 
 
 #print(l)
-print(c)
-print("------------")
-printTree(w)
+#print(c)
+#print("------------")
+#printTree(w)
 
