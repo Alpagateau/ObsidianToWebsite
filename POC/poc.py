@@ -1,7 +1,7 @@
 
-effectChars = ["*", "#", "-", ">", "=", "-", "_", "~", "\\", "\n", "$"]
+effectChars = ["`","*", "#", "-", ">", "=", "-", "_", "~", "\\", "\n", "$", "[", "]", "(", ")"] 
 
-efx = ["#", "##", "###", "####", "#####", "*", "**", "_", "__", "-", "---", "=="]
+efx = ["#", "##", "###", "####", "#####", "*", "**", "_", "__", "-", "---", "==", "[", "[[", "]", "]]", "$$", "$", "`", "```"]
 
 class Node:
     tag = ""
@@ -45,7 +45,7 @@ class Node:
             nNode = Node(">", [nlist[1]])
             self.children += [nNode]
             return self.addChildren(nlist[2:])
-        #to change 
+        #Enclosed, when the first char is diff from the last char
         elif nlist[0] == "-":
             if nlist[1][0] == " ":
                 nNode = Node("-")
@@ -65,6 +65,61 @@ class Node:
                 else:
                     return self.addChildren(nlist[len(temp)+1:])
         
+        elif nlist[0] == "[":
+            nNode = Node("[]")
+            idx = 1 
+            temp = []
+            while nlist[idx] != "]":
+                if idx >= len(nlist):
+                    break 
+                temp += [nlist[idx]]
+                idx+=1
+                if idx == len(nlist):
+                    break 
+            nNode.children += [ "".join(temp) ] #Here, only concatenate 
+            self.children += [nNode] 
+            if len(nlist) > len(temp)+1:
+                return self.addChildren(nlist[len(temp)+2:])
+            else:
+                return self.addChildren(nlist[len(temp)+1:])
+
+        elif nlist[0] == "[[":
+            nNode = Node("[[]]")
+            idx = 1 
+            temp = []
+            while nlist[idx] != "]]":
+                if idx >= len(nlist):
+                    break 
+                temp += [nlist[idx]]
+                idx+=1
+                if idx == len(nlist):
+                    break 
+
+            nNode.children += ["".join(temp)] #Here, only concatenate 
+            self.children += [nNode] 
+            if len(nlist) > len(temp)+1:
+                return self.addChildren(nlist[len(temp)+2:])
+            else:
+                return self.addChildren(nlist[len(temp)+1:])
+        
+        elif nlist[0] == "(":
+            nNode = Node("()")
+            idx = 1 
+            temp = []
+            while nlist[idx] != ")":
+                if idx >= len(nlist):
+                    break 
+                temp += [nlist[idx]]
+                idx+=1
+                if idx == len(nlist):
+                    break 
+            nNode.children += ["".join( temp )] #Here, only concatenate 
+            self.children += [nNode] 
+            if len(nlist) > len(temp)+1:
+                return self.addChildren(nlist[len(temp)+2:])
+            else:
+                return self.addChildren(nlist[len(temp)+1:])
+ 
         elif nlist[0] == "\\":
             if len(nlist[1]) == 1:
                 self.children += [nlist[1]]
@@ -139,6 +194,47 @@ class Node:
                 return self.addChildren(nlist)
             else:
                 return nlist[1:]
+        
+        elif nlist[0] == "$":
+            if self.tag != "$":
+                nNode = Node("$")
+                nlist = nNode.addChildren(nlist[1:])
+                self.children += [nNode]
+
+                return self.addChildren(nlist) 
+            else:
+                return nlist[1:]
+         
+        elif nlist[0] == "$$":
+            if self.tag != "$$":
+                nNode = Node("$$")
+                nlist = nNode.addChildren(nlist[1:])
+                self.children += [nNode]
+
+                return self.addChildren(nlist)
+            else:
+                return nlist[1:]
+        
+        elif nlist[0] == "`":
+            if self.tag != "`":
+                nNode = Node("`")
+                nlist = nNode.addChildren(nlist[1:])
+                self.children += [nNode]
+
+                return self.addChildren(nlist) 
+            else:
+                return nlist[1:]
+        
+        elif nlist[0] == "```":
+            if self.tag != "```":
+                nNode = Node("```")
+                nlist = nNode.addChildren(nlist[1:])
+                self.children += [nNode]
+
+                return self.addChildren(nlist) 
+            else:
+                return nlist[1:]
+        
         else:
             self.children += [nlist[0]]
             a = self.addChildren(nlist[1:])
@@ -204,7 +300,7 @@ def printTree(n, depth = 0):
         else:
             print(("| " * depth) + "|-\"" + n.children[i] + "\"")
 
-lf = loadFile("POC/Sample.md")
+lf = loadFile("POC/test.md")
 l = Lexer(lf)
 c = Cleanup(l)
 w = TreeBuilder(c)
