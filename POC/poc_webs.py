@@ -3,7 +3,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
 import poc_render as pr
 hostName = "localhost"
-serverPort = 8080
+serverPort = 8081
 
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -16,7 +16,7 @@ class MyServer(BaseHTTPRequestHandler):
                     pr.poc.TreeBuilder(
                         pr.poc.Cleanup(
                             pr.poc.Lexer(
-                                pr.poc.loadFile("POC/test.md")
+                                pr.poc.loadFile("RemarkablePOC/index.md")
                             )
                         )
                     )

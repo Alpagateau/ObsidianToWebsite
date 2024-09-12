@@ -6,7 +6,7 @@ def render(tree):
     footer = ""
     if type(tree) == poc.Node: 
         if tree.tag == "page":
-            value = "<!DOCTYPE html>\n<html>\n<head> \n</head>\n<body>\n <style>" +  poc.loadFile("POC/poc.css") + "</style>"
+            value = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\"> \n</head>\n<body>\n <style>" +  poc.loadFile("POC/poc.css") + "</style>"
             footer = "\n</body>\n</html>"
         else:
             value = tree.tag 
