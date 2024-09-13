@@ -2,6 +2,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
 import poc_render as pr
+import treeCleaner as tc
 hostName = "localhost"
 serverPort = 8081
 
@@ -10,19 +11,26 @@ class MyServer(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
-        self.wfile.write(bytes(
-            pr.render(
-                pr.render(
-                    pr.poc.TreeBuilder(
-                        pr.poc.Cleanup(
-                            pr.poc.Lexer(
-                                pr.poc.loadFile("RemarkablePOC/index.md")
-                            )
+
+        print(self.path)
+        finalPath = self.path
+        try:
+            f = open("POC/" + self.path, "r")
+        except:
+            finalPath = "404"
+        
+        if finalPath != "404":
+            tree = tc.TreeShaker(
+                pr.poc.TreeBuilder(
+                    pr.poc.Cleanup(
+                        pr.poc.Lexer(
+                            pr.poc.loadFile("POC" + self.path)
                         )
                     )
                 )
             )
-            ,"utf-8"))
+            #pr.poc.printTree(tree)
+            self.wfile.write(bytes(pr.render(tree),"utf-8"))
         """
         self.wfile.write(bytes("<html><head><title>https://pythonbasics.org</title></head>", "utf-8"))
         self.wfile.write(bytes("<p>Request: %s</p>" % self.path, "utf-8"))

@@ -247,14 +247,18 @@ class Node:
                 return nlist[1:]
         
         elif nlist[0] == u"```":
-            if self.tag != u"```":
-                nNode = Node(u"```")
-                nlist = nNode.addChildren(nlist[1:])
-                self.children += [nNode]
+            nNode = Node(u"```")
+            buff = ""
+            idx = 1
+            while nlist[idx] != "```":
+                buff += nlist[idx]
+                idx += 1 
+                if idx >= len(nlist):
+                    break 
+            nNode.children += [buff]
+            self.children += [nNode]
 
-                return self.addChildren(nlist) 
-            else:
-                return nlist[1:]
+            return self.addChildren(nlist[idx+1:]) 
         
         #Plain text 
         else:
@@ -321,10 +325,10 @@ def printTree(n, depth = 0):
         else:
             print(("| " * depth) + "|->\"" + n.children[i] + "\"")
 
-lf = loadFile("RemarkablePOC/index.md")
-l = Lexer(lf)
-c = Cleanup(l)
-w = TreeBuilder(c)
+#lf = loadFile("RemarkablePOC/index.md")
+#l = Lexer(lf)
+#c = Cleanup(l)
+#w = TreeBuilder(c)
 
 
 #print(l)

@@ -10,4 +10,15 @@ $$
 - This is a second element of a list
 - This is a list with __bold__ elements
 
-There we should try links. Like here, [[Sample.md]]. Or [Web](https://www.youtube.com/watch?v=dQw4w9WgXcQ). 
+There we should try links. Like here, [[Sample.md]]. Or [Web](https://www.youtube.com/watch?v=dQw4w9WgXcQ).
+
+```python 
+print("hello world")
+```
+
+```cpp 
+int main()
+{
+    std::cout << "Hello world" << std::endl;
+}
+```
