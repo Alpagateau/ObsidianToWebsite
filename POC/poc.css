@@ -1,13 +1,20 @@
 
-
 body {
   background-color: rgb(13 17 23);
+}
+
+.middle {
+  background-color: rgb(13 17 23);
   color: white;
-  width: 1000px;
+  width: 800px;
   margin: 0 auto;
   padding: 0 20px 20px 20px;
+  font-size: larger;
+  font-family: math;
 }
 
 h1,h2,h3,h4,h5 {
   color: lightgreen;
 }
+
+

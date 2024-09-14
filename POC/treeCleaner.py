@@ -1,9 +1,10 @@
 import poc 
 
-def TreeShaker(tree):
+def TreeShaker(tree, depth=1):
     # The goal of this method is to read the tree and group branches together in a way that makes more sens.
     # It's in a way, a second parsing pass 
-    
+    if depth < 0:
+        return
     if type(tree) != poc.Node:
         return 
     l = len(tree.children)
@@ -44,8 +45,14 @@ def TreeShaker(tree):
                 nNode.children = [ tree.children[idx].children[0], tree.children[idx-1].children[0]]
                 tree.children[idx-1:idx+1] = []
                 tree.children.insert(idx-1, nNode) 
-            continue
-
+                continue
+            newList = ["("] + tree.children[idx].children + [")"]
+            tree.children.pop(idx)
+            for j in range(len(newList)):
+                tree.children.insert(idx + j, newList[j])
+            
+    
+    TreeShaker(tree, depth-1)
     return tree
 
 """

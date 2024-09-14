@@ -9,6 +9,4 @@ Also, let's not implement mermaid rn, neither canvas. Those will take very long 
 
 # TODO 
 Ordered lists are not implemented yet
-Neither are tables
-
-Also need to create the renderer 
+Neither are tables 

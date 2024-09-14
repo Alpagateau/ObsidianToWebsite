@@ -119,13 +119,20 @@ class Node:
             nNode = Node(u"()")
             idx = 1 
             temp = []
-            while nlist[idx] != u")":
+            opened = 1
+            maxIt = 10
+            while opened != 0 and maxIt > 0:
+                if nlist[idx] == ")":
+                    opened -= 1
+                if nlist[idx] == "(":
+                    opened += 1
                 if idx >= len(nlist):
                     break 
                 temp += [nlist[idx]]
                 idx+=1
                 if idx == len(nlist):
                     break 
+                maxIt -= 1
             nNode.children += ["".join( temp )] #Here, only concatenate 
             self.children += [nNode] 
             if len(nlist) > len(temp)+1:

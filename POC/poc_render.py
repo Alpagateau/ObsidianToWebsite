@@ -21,8 +21,10 @@ def render(tree):
                 <script>hljs.highlightAll();</script>
             </head>
             <body>
-                <style>""" +  poc.loadFile("POC/poc.css") + "</style>"
-            footer = "\n</body>\n</html>"
+                <style>""" +  poc.loadFile("POC/poc.css") + "</style>" + """
+                <div class=\"middle\">
+                """
+            footer = "\n</div>\n</body>\n</html>"
         else:
             value = tree.tag 
 
@@ -90,7 +92,20 @@ def render(tree):
         if tree.tag == "[[]]":
             if "|" in tree.children[0]:
                 #split the name and the url 
-                print("TO IMPLEMENT")
+                adress = ""
+                name = ""
+                passed = False 
+                for i in range(len(tree.children[0])):
+                    if tree.children[0][i] == "|":
+                        passed = True 
+                        continue 
+                    if passed:
+                        name += tree.children[0][i]
+                    else:
+                        adress += tree.children[0][i]
+                value = "<a href = \"" + adress + "\">" + name 
+                footer = "</a>"
+                tree.children = []
             else:
                 value = "<a href=\"" + tree.children[0] + "\">" + tree.children[0]
                 footer = "</a>"
@@ -125,4 +140,5 @@ print(
         )
     )
 )
-"""
+    """
+
