@@ -11,6 +11,7 @@ $$
 - This is a list with __bold__ elements
 
 There we should try links. Like here, [[Sample.md]]. Or [Web](https://www.youtube.com/watch?v=dQw4w9WgXcQ).
+May i also try to nest parenteses. Like (this is all in one (but this is two) finished )
 
 ```python 
 print("hello world")

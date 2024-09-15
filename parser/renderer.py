@@ -1,9 +1,27 @@
-import poc
+import parser.parser as ps #for symplicity
+import parser.utils as ut
+
+simpleCor = {
+    #"#"     : ("<h1>"   , "</h1>"   ),
+    "h2"    : ("<h2>"   , "</h2>"   ),
+    "h3"    : ("<h3>"   , "</h3>"   ),
+    "h4"    : ("<h4>"   , "</h4>"   ),
+    "h5"    : ("<h5>"   , "</h5>"   ),
+    "*"     : ("<i>"    , "</i>"    ),
+    "**"    : ("<b>"    , "</b>"    ),
+    "=="    : ("<mark>" , "</mark>" ),
+    "~~"    : ("<s>"    , "</s>"    ),
+    "$"     : ("\\("    , "\\)"     ),
+    "$$"    : ("\\["    , "\\]"     ),
+    "ls"    : ("<ul>"   , "</ul>"   ),
+    "le"    : ("<li>"   , "</li>"   ),
+}
 
 def render(tree):
+    global simpleCor 
     value = ""
     footer = ""
-    if type(tree) == poc.Node: 
+    if type(tree) == ps.Node: 
         if tree.tag == "page":
             value = """
             <!DOCTYPE html>
@@ -20,13 +38,13 @@ def render(tree):
                 <script>hljs.highlightAll();</script>
             </head>
             <body>
-                <style>""" +  poc.loadFile("POC/poc.css") + "</style>" + """
+                <style>""" +  ut.LoadFile("POC/poc.css") + "</style>" + """
                 <div class=\"middle\">
                 """
             footer = "\n</div>\n</body>\n</html>"
         else:
             value = tree.tag 
-
+        
         if tree.tag == "#":
             if tree.children[0][0] == " ":
                 value = "<h1>"
@@ -34,60 +52,19 @@ def render(tree):
             else:
                 value = "<div class=\"tag\">"
                 footer = "</div>"
-
-        if tree.tag == "##":
-            value = "<h2>"
-            footer = "</h2>\n"
-        if tree.tag == "###":
-            value = "<h3>"
-            footer = "</h3>\n"
         
-        if tree.tag == "####":
-            value = "<h4>"
-            footer = "</h4>\n"
-        if tree.tag == "#####":
-            value = "<h5>"
-            footer = "</h5>\n"
-
-        if tree.tag == "*" or tree.tag == "_":
-            value = "<i>"
-            footer = "</i>"
+        if tree.tag in simpleCor.keys():
+            value, footer = simpleCor[tree.tag]
         
-        if tree.tag == "**" or tree.tag == "__":
-            value = "<strong>"
-            footer = "</strong>"
-
         if tree.tag == "***":
             value = "<strong><i>"
             footer = "</i></strong>"
-        
-        if tree.tag == "~~":
-            value = "<s>"
-            footer = "</s>"
-        
-        if tree.tag == "==":
-            value = "<mark>"
-            footer = "</mark>"
-
+        '''
         if tree.tag == "bl":
             value = "<br>"
         if tree.tag == "bbl":
             value = "<br><br>"
-        
-        if tree.tag == "$":
-            value = "\\("
-            footer = "\\)"
-        if tree.tag == "$$":
-            value = "\\["
-            footer = "\\]"
-
-        if tree.tag == "ls":
-            value = "<ul>"
-            footer = "</ul>"
-        if tree.tag == "le":
-            value = "<li>"
-            footer = "</li>"
-
+        '''
         if tree.tag == "[[]]":
             if "|" in tree.children[0]:
                 #split the name and the url 
@@ -127,17 +104,4 @@ def render(tree):
         return value + "".join([render(i) for i in tree.children]) + footer 
     else:
         return tree
-"""
-print(
-    render(
-        poc.TreeBuilder(
-            poc.Cleanup(
-                poc.Lexer(
-                    poc.loadFile("POC/test.md")
-                )
-            )
-        )
-    )
-)
-    """
 
