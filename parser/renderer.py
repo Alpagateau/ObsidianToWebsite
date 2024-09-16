@@ -2,11 +2,12 @@ import parser.parser as ps #for symplicity
 import parser.utils as ut
 
 simpleCor = {
-    #"#"     : ("<h1>"   , "</h1>"   ),
+    #"#"     : ("<h1>"   , "</h1>"   ), #cant use this one because it's also used for tags
     "h2"    : ("<h2>"   , "</h2>"   ),
     "h3"    : ("<h3>"   , "</h3>"   ),
     "h4"    : ("<h4>"   , "</h4>"   ),
     "h5"    : ("<h5>"   , "</h5>"   ),
+    "br"    : ("<br>"   , ""        ),
     "*"     : ("<i>"    , "</i>"    ),
     "**"    : ("<b>"    , "</b>"    ),
     "=="    : ("<mark>" , "</mark>" ),
@@ -45,7 +46,7 @@ def render(tree):
         else:
             value = tree.tag 
         
-        if tree.tag == "#":
+        if tree.tag == "h1":
             if tree.children[0][0] == " ":
                 value = "<h1>"
                 footer = "</h1>\n"

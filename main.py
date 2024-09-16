@@ -23,7 +23,7 @@ class MyServer(BaseHTTPRequestHandler):
         finalPath = ""
         errorMsg = ""
         if currentPath[-3:] == ".md":
-            finalPath = "." + currentPath 
+            finalPath = "./Revisions" + currentPath 
         else:
             for i in range(len(DIRS)):
                 if os.path.exists(DIRS[i] + currentPath + ".md"):

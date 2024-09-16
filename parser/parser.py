@@ -13,22 +13,22 @@ class Rule:
         self.canBeNested = canBeNested
 
 rules = [
-    Rule("h1",  "#",     "\n", True),
-    Rule("h2",  "##",    "\n", True),
-    Rule("h3",  "###",   "\n", True),
-    Rule("h4",  "####",  "\n", True),
-    Rule("h5",  "#####", "\n", True),
-    Rule("*" ,  "*",     "*"),
-    Rule("*" ,  "_",     "_"),
+    Rule("h1",  "#",     "\n" , True),
+    Rule("h2",  "##",    "\n" , True),
+    Rule("h3",  "###",   "\n" , True),
+    Rule("h4",  "####",  "\n" , True),
+    Rule("h5",  "#####", "\n" , True),
+    Rule("*" ,  "*",     "*") ,
+    Rule("*" ,  "_",     "_") ,
     Rule("**",  "**",    "**"),
     Rule("**",  "__",    "__"),
-    Rule("==",  "==",    "==", True),
+    Rule("==",  "==",    "==" , True),
     Rule("~~",  "~~",    "~~"),
-    Rule("$$",  "$$",    "$$", True),
-    Rule("$ ",  "$",     "$",  True),
-    Rule("()",  "(",     ")",  False, True),
-    Rule("[]" , "[",     "]",  True),
-    Rule("[[]]","[[",    "]]", True),
+    Rule("$$",  "$$",    "$$" , True),
+    Rule("$",   "$",     "$"  , True),
+    Rule("()",  "(",     ")"  , False, True),
+    Rule("[]" , "[",     "]"  , True),
+    Rule("[[]]","[[",    "]]" , True),
     Rule("```", "```",   "```",True),
     Rule("-",   "-",     "\n")
 ]
@@ -58,7 +58,10 @@ class Node:
         #print(nlist[0])
         if idx < 0:
             #no rules where met 
-            self.children += [nlist[0]]
+            if nlist[0] != "\n":
+                self.children += [nlist[0]]
+            else:
+                self.children += [Node("br", [""])]
             return self.addChildren(nlist[1:])
         
         r = rules[idx]
