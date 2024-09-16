@@ -1,17 +1,33 @@
+import re
+import parser.lexer as pl
+
 class Rule:
     start = ""
     end = ""
     tag = ""
     justText = False 
     canBeNested = False 
-    
-    def __init__(self, tg, st, end="", justText = False, canBeNested = False):
+    previousChar = ""
+
+    def __init__(self, tg, st, end="", justText = False, canBeNested = False, prevChar = ""):
         self.tag = tg 
         self.start = st 
         self.end = end 
         self.justText = justText
         self.canBeNested = canBeNested
+        self.previousChar = prevChar 
 
+table_regex = re.compile(r'''
+
+            ^\|.*\|\s*\n                # Header row
+
+                ^\|[-:| ]+\|\s*\n           # Alignment row
+
+                (?:^\|.*\|\s*)+            # Data rows
+
+            ''', re.VERBOSE | re.MULTILINE | re.DOTALL)
+
+#       tag   1st c   last c onlyText nested lastChar 
 rules = [
     Rule("h1",  "#",     "\n" , True),
     Rule("h2",  "##",    "\n" , True),
@@ -29,8 +45,8 @@ rules = [
     Rule("()",  "(",     ")"  , False, True),
     Rule("[]" , "[",     "]"  , True),
     Rule("[[]]","[[",    "]]" , True),
-    Rule("```", "```",   "```",True),
-    Rule("-",   "-",     "\n")
+    Rule("```", "```",   "```", True),
+    Rule("-",   "-",     "\n" , False, False, "\n")
 ]
 
 class Node:
@@ -40,21 +56,33 @@ class Node:
     def __init__(self,t = "", c = []):
         self.tag = t
         self.children = c.copy()
+        self.value = ""
 
-    def addChildren(self, cln):
+    def addChildren(self, cln, prev=""):
         global rules 
-        
+        global table_regex        
         nlist = cln.copy()
         
         if nlist == []:
             return []
+
+        if re.search(table_regex ,nlist[0]) != None:
+            table_node = parse_table_block(nlist[0])
+            self.children += [table_node]
+            return self.addChildren(nlist[1:], prev=nlist[0][-1])
+
         idx = -1 #rule index 
         noffset = 1 #number of elements to remove before next operation
         #check if any rules work 
         for i in range(len(rules)):
             if nlist[0] == rules[i].start:
-                idx = i
-                break 
+                if rules[i].previousChar != "":
+                    if rules[i].previousChar == prev:
+                        idx = i 
+                        break 
+                else:
+                    idx = i
+                    break 
         #print(nlist[0])
         if idx < 0:
             #no rules where met 
@@ -62,7 +90,7 @@ class Node:
                 self.children += [nlist[0]]
             else:
                 self.children += [Node("br", [""])]
-            return self.addChildren(nlist[1:])
+            return self.addChildren(nlist[1:], prev=nlist[0])
         
         r = rules[idx]
         nNode = None
@@ -74,11 +102,14 @@ class Node:
             else:
                 buffer = ""
                 off = 1
-                while nlist[off] != r.end:
-                    buffer += nlist[off] 
-                    off += 1
-                    if off == len(nlist):
-                        break
+                if len(nlist) == 1:
+                    buffer = nlist 
+                else:
+                    while nlist[off] != r.end:
+                        buffer += nlist[off] 
+                        off += 1
+                        if off >= len(nlist):
+                            break
                 nNode.children = [buffer]
                 noffset = off+1
         else:
@@ -163,8 +194,42 @@ def TreeShaker(tree, depth=1):
     
     TreeShaker(tree, depth-1)
     return tree
-
-
+#this function was made by chatgpt, i apologize... I will rewrite later, but rn i just want it to go in prod 
+def parse_table_block(table_block):
+    lines = table_block.strip().split('\n') 
+    
+    # Create the root node for the table 
+    table_node = Node('table')
+    # Create and populate the thead (header)
+    thead_node = Node('thead')
+    header_row = Node('tr')
+    
+    headers = [header.strip() for header in lines[0][1:-1].split('|')]
+    alignments = [alignment.strip() for alignment in lines[1][1:-1].split('|')]
+    
+    for header, alignment in zip(headers, alignments):
+        th_node = Node('th')
+        th_node.children += [header] 
+        th_node.alignment = alignment  # Store alignment as an attribute 
+        header_row.children += [th_node]
+    
+    thead_node.children += [header_row]
+    table_node.children += [thead_node]
+    # Create and populate the tbody (body)
+    tbody_node = Node('tbody')
+    
+    for row in lines[2:]:
+        tr_node = Node('tr')
+        cells = [cell.strip() for cell in row[1:-1].split('|')]
+        for i, cell in enumerate(cells):
+            td_node = Node('td')
+            td_node.addChildren(pl.Lexer(cell)) 
+            td_node.alignment = alignments[i]  # Store alignment as an attribute 
+            tr_node.children += [td_node]
+        tbody_node.children += [tr_node]
+    
+    table_node.children += [tbody_node]
+    return table_node
 
 def BuildTree(lexed):
     tree = Node("page")

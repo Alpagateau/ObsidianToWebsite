@@ -87,7 +87,6 @@ def render(tree):
                 value = "<a href=\"" + tree.children[0] + "\">" + tree.children[0]
                 footer = "</a>"
                 tree.children = []
-
         
         if tree.tag == "```":
             language = ""
@@ -102,7 +101,28 @@ def render(tree):
         if tree.tag == "wl":
             value = "<a href = \"" + tree.children[0] + "\" >" + tree.children[1] + "</a>"
             tree.children = []
+        
+        #table handling 
+        if tree.tag == "table":
+            headers = tree.children[0].children[0]
+            data = tree.children[1]
+            value = "<table><tr>"
+            footer = "</table>"
+            
+            for i in range(len(headers.children)):
+                value += "<th>" + headers.children[i].children[0] + "</th>"
+            value += "</tr>\n"
+            for i in range(len(data.children)):
+                value += "<tr>"
+                for j in range(len(data.children[i].children)):
+                    value += "<td>" + "".join([render(i) for i in data.children[i].children[j].children]) + "</td>\n"
+                value += "</tr>\n"
+            return value + footer 
+        #print(type(value), type(footer))
         return value + "".join([render(i) for i in tree.children]) + footer 
     else:
-        return tree
+        if type(tree) == type([0,0]):
+            return "".join(tree)
+        else:
+            return tree
 
