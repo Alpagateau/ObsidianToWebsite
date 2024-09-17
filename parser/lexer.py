@@ -27,23 +27,17 @@ table_regex_ = re.compile(r'''
 
 # Define the regex pattern
 
-table_regex = re.compile(r'''
+table_regex = r"((\|\s([^\n])+)\n)+\n"
 
-            ^\|.*\|\s*\n                # Header row
-
-                ^\|[-:| ]+\|\s*\n           # Alignment row
-
-                (?:^\|.*\|\s*)+            # Data rows
-
-            ''', re.VERBOSE | re.MULTILINE | re.DOTALL)
+opts = (re.MULTILINE | re.DOTALL)
 #clean up lexed list by tokenizing it 
 def Cleanup(cln):
-    global tokens 
+    global tokens, table_regex, opts 
     lexed = cln.copy()
     if lexed == []:
         return []
     #print(lexed[0])
-    if table_regex.search(lexed[0]) != None:
+    if re.search(table_regex,lexed[0]) != None:
         return [lexed[0]] + Cleanup(lexed[1:])
     if lexed[0] in cutChars: 
         possibleTokens = [] 
@@ -69,17 +63,27 @@ def Cleanup(cln):
         return [lexed[0]] + Cleanup(lexed[1:])
 
 def Lexer(inputFile):
-    global cutChars
+    global cutChars, table_regex, opts 
     o = []
     buffer = u""
-    toParse = []
-    notLs = re.split(table_regex ,inputFile)
-    ls = re.findall(table_regex, inputFile)
-    for i in range(len(ls)):
-        toParse += [notLs[i], ls[i]]
-    toParse += [notLs[-1]]
+    toParse = [inputFile]
+    tables = []
+    ls = re.finditer(table_regex, inputFile, re.MULTILINE)
+
+    for matchNum, match in enumerate(ls, start=1):
+        print("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, 
+                                                                            start = match.start(), 
+                                                                            end = match.end(), 
+                                                                            match = match.group()))
+        offset = len("".join(toParse[:-1])) 
+        ln = (match.end() - match.start())
+        #print(offset, type(match.group()))
+        print(toParse[-1][0:match.start() - offset])
+        toParse = toParse[:-1] + [ toParse[-1][0:match.start()-offset], match.group(), toParse[-1][match.end()-offset:]]
+    
+    print(len(toParse))
     for i in range(len(toParse)):
-        if table_regex.search(toParse[i]) != None:
+        if re.search(table_regex, toParse[i]) != None:
             o += [toParse[i]]
             continue 
         for j in range(len(toParse[i])):
