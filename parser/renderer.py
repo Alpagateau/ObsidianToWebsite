@@ -92,7 +92,7 @@ def render(tree, pagename = ""):
                     value = "<img src = \"" + adress + "\"width = \"" + name + "px\">" 
                     footer = ""
                 else:
-                    value = "<iframe src=\"" + adress + "\">"
+                    value = "<iframe src=\"" + adress + ".md\">"
                     footer = "</iframe>"
                 tree.children = []
             else:
@@ -101,7 +101,7 @@ def render(tree, pagename = ""):
                     value = "<img src=\"" + tree.children[0] + "\">"
                     footer = ""
                 else:
-                    value = "<iframe src=\"" + tree.children[0] + "\">"
+                    value = "<iframe src=\"" + tree.children[0] + ".md\">"
                     footer = "</iframe>"
                 tree.children = []
  

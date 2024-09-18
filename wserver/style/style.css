@@ -1,12 +1,14 @@
 
 body {
   background-color: rgb(13 17 23);
+  font-size: larger;
+  font-family: hasklig, monospace;
 }
 
 .middle {
   background-color: rgb(13 17 23);
   color: white;
-  width: 700px;
+  width: 800px;
   margin: 0 auto;
   padding: 0 20px 20px 20px;
   font-size: larger;
@@ -25,13 +27,34 @@ body {
   object-fit: contain;
 }
 
+footer{
+  display: flex;
+  flex-direction: row;
+  color: white;
+  background-color: rgb(37 48 65);
+  align-content: center;
+}
+
+.fcolumn {
+  padding: 10px;
+  flex: 1;
+}
+
+.fcolumn a{
+  color: lightgreen;
+}
+
+.fcolumn#empty {
+  display: inline-block;
+  flex: 2;
+}
+
 .tag {
   visibility: collapse;
 }
 
 h1,h2,h3,h4,h5 {
   color: lightgreen;
-  line-height:40px;
 }
 
 
