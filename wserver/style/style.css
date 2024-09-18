@@ -1,0 +1,37 @@
+
+body {
+  background-color: rgb(13 17 23);
+}
+
+.middle {
+  background-color: rgb(13 17 23);
+  color: white;
+  width: 700px;
+  margin: 0 auto;
+  padding: 0 20px 20px 20px;
+  font-size: larger;
+  font-family: hasklig, monospace;
+}
+
+.middle .pageTitle{
+  color: lightgreen;
+  font-weight: bold;
+  font-size: 40px;
+}
+
+.middle img {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+}
+
+.tag {
+  visibility: collapse;
+}
+
+h1,h2,h3,h4,h5 {
+  color: lightgreen;
+  line-height:40px;
+}
+
+

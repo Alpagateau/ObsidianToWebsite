@@ -16,33 +16,18 @@ simpleCor = {
     "$$"    : ("\\["    , "\\]"     ),
     "ls"    : ("<ul>"   , "</ul>"   ),
     "le"    : ("<li>"   , "</li>"   ),
+    "()"    : ("("      , ")"       ),
 }
 
-def render(tree):
+def render(tree, pagename = ""):
     global simpleCor 
     value = ""
     footer = ""
     if type(tree) == ps.Node: 
         if tree.tag == "page":
-            value = """
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset=\"UTF-8\">
-                
-                <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-                
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/night-owl.css">
-                
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
-                <script>hljs.highlightAll();</script>
-            </head>
-            <body>
-                <style>""" +  ut.LoadFile("POC/poc.css") + "</style>" + """
-                <div class=\"middle\">
-                """
-            footer = "\n</div>\n</body>\n</html>"
+            value = ut.LoadFile("./wserver/defaultPage.html")
+            footer = value[value.find("¤")+1:] 
+            value = value[:value.find("¤")] + "<div class=\"pageTitle\">" + pagename + "</div>"
         else:
             value = tree.tag 
         
@@ -80,14 +65,46 @@ def render(tree):
                         name += tree.children[0][i]
                     else:
                         adress += tree.children[0][i]
-                value = "<a href = \"" + adress + "\">" + name 
+                value = "<a href = \"" + adress + ".md\">" + name 
                 footer = "</a>"
                 tree.children = []
             else:
-                value = "<a href=\"" + tree.children[0] + "\">" + tree.children[0]
+                value = "<a href=\"" + tree.children[0] + ".md\">" + tree.children[0]
                 footer = "</a>"
                 tree.children = []
         
+        if tree.tag == "![[]]":
+            if "|" in tree.children[0]:
+                #split the name and the url 
+                adress = ""
+                name = ""
+                passed = False 
+                for i in range(len(tree.children[0])):
+                    if tree.children[0][i] == "|":
+                        passed = True 
+                        continue 
+                    if passed:
+                        name += tree.children[0][i]
+                    else:
+                        adress += tree.children[0][i]
+                name, ext = ut.GetFileName(adress)
+                if ext in ut.IMAGE_EXT:
+                    value = "<img src = \"" + adress + "\"width = \"" + name + "px\">" 
+                    footer = ""
+                else:
+                    value = "<iframe src=\"" + adress + "\">"
+                    footer = "</iframe>"
+                tree.children = []
+            else:
+                name, ext = ut.GetFileName(tree.children[0]) 
+                if ext in ut.IMAGE_EXT:
+                    value = "<img src=\"" + tree.children[0] + "\">"
+                    footer = ""
+                else:
+                    value = "<iframe src=\"" + tree.children[0] + "\">"
+                    footer = "</iframe>"
+                tree.children = []
+ 
         if tree.tag == "```":
             language = ""
             i = 0

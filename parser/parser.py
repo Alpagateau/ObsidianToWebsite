@@ -17,36 +17,31 @@ class Rule:
         self.canBeNested = canBeNested
         self.previousChar = prevChar 
 
-table_regex = re.compile(r'''
-
-            ^\|.*\|\s*\n                # Header row
-
-                ^\|[-:| ]+\|\s*\n           # Alignment row
-
-                (?:^\|.*\|\s*)+            # Data rows
-
-            ''', re.VERBOSE | re.MULTILINE | re.DOTALL)
-
+table_regex = re.compile(r"((\|\s([^\n])+)\n)+\n",re.MULTILINE)
 #       tag   1st c   last c onlyText nested lastChar 
 rules = [
-    Rule("h1",  "#",     "\n" , True),
-    Rule("h2",  "##",    "\n" , True),
-    Rule("h3",  "###",   "\n" , True),
-    Rule("h4",  "####",  "\n" , True),
-    Rule("h5",  "#####", "\n" , True),
-    Rule("*" ,  "*",     "*") ,
-    Rule("*" ,  "_",     "_") ,
-    Rule("**",  "**",    "**"),
-    Rule("**",  "__",    "__"),
-    Rule("==",  "==",    "==" , True),
-    Rule("~~",  "~~",    "~~"),
-    Rule("$$",  "$$",    "$$" , True),
-    Rule("$",   "$",     "$"  , True),
-    Rule("()",  "(",     ")"  , False, True),
-    Rule("[]" , "[",     "]"  , True),
-    Rule("[[]]","[[",    "]]" , True),
-    Rule("```", "```",   "```", True),
-    Rule("-",   "-",     "\n" , False, False, "\n")
+    Rule("h1",   "#",     "\n" , True),
+    Rule("h2",   "##",    "\n" , True),
+    Rule("h3",   "###",   "\n" , True),
+    Rule("h4",   "####",  "\n" , True),
+    Rule("h5",   "#####", "\n" , True),
+    Rule("*" ,   "*",     "*") ,
+    Rule("*" ,   "_",     "_") ,
+    Rule("**",   "**",    "**"),
+    Rule("**",   "__",    "__"),
+    Rule("==",   "==",    "==" , True),
+    Rule("~~",   "~~",    "~~"),
+    Rule("$$",   "$$",    "$$" , True),
+    Rule("$",    "$",     "$"  , True),
+    Rule("()",   "(",     ")"  , False, True),
+    Rule("[]" ,  "[",     "]"  , True),
+    Rule("[[]]", "[[",    "]]" , True),
+    Rule("![[]]","![[",   "]]" , True),
+    Rule("![",   "![",    "]"  , True),
+    Rule("```",  "```",   "```", True),
+    Rule("-",    "-",     "\n" , False, False, "\n"),
+    Rule("-_",   "-",     "\n",  False, False, "\t"),
+    Rule("-_",   "-",     "\n",  False, False, "    ")
 ]
 
 class Node:
@@ -58,7 +53,7 @@ class Node:
         self.children = c.copy()
         self.value = ""
 
-    def addChildren(self, cln, prev=""):
+    def addChildren(self, cln, prev="¤"):
         global rules 
         global table_regex        
         nlist = cln.copy()
@@ -77,8 +72,9 @@ class Node:
         for i in range(len(rules)):
             if nlist[0] == rules[i].start:
                 if rules[i].previousChar != "":
+                    #print(nlist[0], repr(prev))
                     if rules[i].previousChar == prev:
-                        idx = i 
+                        idx = i
                         break 
                 else:
                     idx = i
@@ -115,7 +111,7 @@ class Node:
         else:
             if r.end == "":
                 print("You should not be there : 75")
-                nNode.addChildren([nlist[1]])
+                nNode.addChildren([nlist[1]], nlist[1][-1])
             else:
                 buffer = []
                 off = 1
@@ -138,7 +134,13 @@ class Node:
                 noffset = off+1 
 
         self.children += [nNode]
-        return self.addChildren(nlist[noffset:])
+        previous = ""
+        try:
+            previous =  nlist[noffset-1][-1]
+        except:
+            #print("Error occured :", nlist[noffset:])
+            previous = ""
+        return self.addChildren(nlist[noffset:], previous)
 
 def TreeShaker(tree, depth=1):
     # The goal of this method is to read the tree and group branches together in a way that makes more sens.
@@ -164,13 +166,31 @@ def TreeShaker(tree, depth=1):
         if tree.children[idx].tag == "-":
             buffer = []
             offset = 0
-
-            while type(tree.children[idx - offset]) == Node and tree.children[idx - offset].tag == "-":
+            t = lambda x : \
+                ( type(tree.children[x]) == Node ) and \
+                ( tree.children[x].tag == "-" or tree.children[x].tag == "-_")
+            
+            while t(idx - offset):
                 buffer += [Node("le",tree.children[idx - offset].children)]
                 offset += 1
                 if idx - offset < 0:
                     break
             nNode = Node("ls", buffer)
+            tree.children[idx-offset+1:idx+1] = []
+            tree.children.insert(idx-offset+1, nNode)
+            continue
+        #numbered lists :
+        numerals =  [str(i) + "." for i in range(10)]
+        if tree.children[idx].tag in numerals:
+            buffer = []
+            offset = 0
+            
+            while type(tree.children[idx-offset]) == Node and tree.children[idx-offset].tag in numerals: 
+                buffer += [Node("ne", tree.children[idx - offset].children)]
+                offset += 1
+                if idx - offset < 0:
+                    break 
+            nNode = Node("nl", buffer)
             tree.children[idx-offset+1:idx+1] = []
             tree.children.insert(idx-offset+1, nNode)
             continue

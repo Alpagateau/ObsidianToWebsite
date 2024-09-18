@@ -129,3 +129,5 @@ dist
 .yarn/install-state.gz
 .pnp.*
 /POC/__pycache__
+/parser/__pycache__
+/__pycache__
