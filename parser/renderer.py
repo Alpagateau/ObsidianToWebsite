@@ -23,13 +23,16 @@ simpleCor = {
     ">"     : ("<blockquote>", "</blockquote>")
 }
 
-def render(tree, pagename = ""):
+def render(tree, pagename = "", minimized = False):
     global simpleCor 
     value = ""
     footer = ""
     if type(tree) == ps.Node: 
         if tree.tag == "page":
-            value = ut.LoadFile("./wserver/defaultPage.html")
+            if not minimized:
+                value = ut.LoadFile("./wserver/defaultPage.html")
+            else:
+                value = ut.LoadFile("./wserver/minhtml.html")
             footer = value[value.find("¤")+1:] 
             value = value[:value.find("¤")] + "<div class=\"pageTitle\">" + pagename + "</div>"
         else:
@@ -102,7 +105,7 @@ def render(tree, pagename = ""):
                     value = "<img src = \"" + adress + "\"width = \"" + name + "px\">" 
                     footer = ""
                 else:
-                    value = "<iframe src=\"" + adress + ".md\">"
+                    value = "<iframe src=\"" + adress + ".md%\">"
                     footer = "</iframe>"
                 tree.children = []
             else:
@@ -111,7 +114,7 @@ def render(tree, pagename = ""):
                     value = "<img src=\"" + tree.children[0] + "\">"
                     footer = ""
                 else:
-                    value = "<iframe src=\"" + tree.children[0] + ".md\">"
+                    value = "<iframe src=\"" + tree.children[0] + ".md%\">"
                     footer = "</iframe>"
                 tree.children = []
  
@@ -139,7 +142,7 @@ def render(tree, pagename = ""):
             footer = "</table>"
             
             for i in range(len(headers.children)):
-                value += "<th>" + headers.children[i].children[0] + "</th>"
+                value += "<th>" + "".join(render(x) for x in headers.children[i].children) + "</th>"
             value += "</tr>\n"
             for i in range(len(data.children)):
                 value += "<tr>"

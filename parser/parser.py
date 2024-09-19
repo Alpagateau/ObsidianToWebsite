@@ -232,7 +232,7 @@ def parse_table_block(table_block):
     
     for header, alignment in zip(headers, alignments):
         th_node = Node('th')
-        th_node.children += [header] 
+        th_node.addChildren(pl.Lexer(header)) 
         th_node.alignment = alignment  # Store alignment as an attribute 
         header_row.children += [th_node]
     

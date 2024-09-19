@@ -1,4 +1,3 @@
-# Python 3 server example
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
 from parser.utils import *
@@ -22,8 +21,13 @@ class MyServer(BaseHTTPRequestHandler):
         if response["code"] == 200:
             if response["ext"] == "md":
                 tree = BuildTree(Lexer(LoadFile(response["path"])))
-                self.wfile.write( bytes( render(tree, pagename = response["filename"]) ,"utf-8") )
-            
+                self.wfile.write(
+                    bytes(render(
+                        tree, 
+                        pagename = response["filename"], 
+                        minimized = response["min"]
+                    ) ,"utf-8") )
+
             elif response["ext"] == "css":
                 self.wfile.write( bytes(LoadFile(response["path"]), "utf-8") )
             else:
@@ -44,12 +48,27 @@ def Direct(rpath):
         "path" : "./Revisions",
         "err"  : "",
         "filename" : "",
-        "ext" : ""
+        "ext" : "",
+        "min": False 
     }
+
+    if currentPath[-1] == "%":
+        response["min"] = True
+        currentPath = currentPath[:-1]
     
+    if rpath=="/":
+        response["code"] = 301
+        response["hprefix"] = "Location"
+        response["hcontent"] = "index.md"
+        response["ext"] = "md"
+        return response 
+
     filename, ext = GetFileName(currentPath)
     response["filename"] = filename
     response["ext"] = ext 
+    
+    mockup = "/" + filename+"."+ext
+
     if ext == "css":
         response["hcontent"] = "text/css"
         response["path"] = "./wserver/style" + currentPath 
@@ -65,11 +84,19 @@ def Direct(rpath):
         if os.path.exists("./Revisions" + currentPath):
             response["path"] = "./Revisions" + currentPath
         elif os.path.exists("./Revisions/Cours" + currentPath):
+            print(currentPath + " is in cours")
             response["code"] = 301
             response["hprefix"] = "Location"
             response["hcontent"] = "/Cours" + currentPath
             response["path"] = ""
+        elif os.path.exists("./Revisions/Preuves" + mockup):
+            response["code"] = 301
+            response["hprefix"] = "Location"
+            response["hcontent"] = "/Preuves" + mockup + ("" if not response["min"] else "%")
+            response["path"] = ""
+            print("Are we even here ?")
         else:
+            print("Could not find " + currentPath)
             response["code"] = 404
             response["err"] = "File " + currentPath + " not found"
     return response

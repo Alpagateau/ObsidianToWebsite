@@ -11,17 +11,17 @@ body {
 }
 
 .leftc {
-  flex: 2;
+  flex: 3;
 }
 
 .rightc {
-  flex: 2;
+  flex: 3;
 }
 
 .middle {
   background-color: rgb(13 17 23);
   color: white;
-  flex: 3;
+  flex: 6;
   margin: 0 auto;
   padding: 0 20px 20px 20px;
   font-size: larger;
@@ -68,5 +68,4 @@ footer{
 h1,h2,h3,h4,h5 {
   color: lightgreen;
 }
-
 
