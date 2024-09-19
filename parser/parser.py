@@ -41,7 +41,10 @@ rules = [
     Rule("```",  "```",   "```", True),
     Rule("-",    "-",     "\n" , False, False, "\n"),
     Rule("-_",   "-",     "\n",  False, False, "\t"),
-    Rule("-_",   "-",     "\n",  False, False, "    ")
+    Rule("-_",   "-",     "\n",  False, False, "    "),
+    Rule(">",    ">",     "\n",   False, False),
+    Rule("---",  "---",   "\n"),
+    Rule("^",    "^",     "\n"),
 ]
 
 class Node:
@@ -163,7 +166,7 @@ def TreeShaker(tree, depth=1):
             continue 
         
         #lists
-        if tree.children[idx].tag == "-":
+        if tree.children[idx].tag == "-" or tree.children[idx].tag == "-_":
             buffer = []
             offset = 0
             t = lambda x : \

@@ -13,7 +13,7 @@ def GetExtension(f):
     for i in range(len(f)):
         if f[len(f) - i] == ".":
             return buff 
-        buff = f[len(f) - i - 1] + buff
+        buff = f[len(f) - i - 1] + buff 
 
 def GetFileName(f):
     ext = ""
@@ -33,3 +33,4 @@ def GetFileName(f):
             else:
                 buff = f[len(f) - i - 1] + buff
     return (buff, ext)
+

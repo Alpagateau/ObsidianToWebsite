@@ -13,68 +13,66 @@ serverPort = 6969
 
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
-        self.send_response(200)
-        currentPath = self.path.replace("%20", " ") \
-                                .replace("%C3%A9", "é") \
-                                .replace("%C3%B4", "ô") \
-                                .replace("%C3%A8", "è")
-        finalPath = ""
-        errorMsg = ""
-        #print("Current path : " + currentPath)
-        filename, ext = GetFileName(currentPath)
-        if ext == "md":
-            finalPath = "./Revisions" + currentPath 
-        elif ext == "css":
-            finalPath = "./wserver/style" + currentPath
-        elif ext in IMAGE_EXT:
-            finalPath = "./Revisions/Média/" + filename + "." + ext
-        else:
-            errorMsg = """
-            <head>
-                <meta charset=\"UTF-8\">
-            </head> 
-            no extension found, do you mean <a href = \"""" + currentPath + ".md \">this ?</a>"       
-        if finalPath != "":
-            if ext == "md":
-                self.send_header("Content-type", "text/html")
-                self.end_headers()
-                tree = BuildTree(
-                    Lexer(
-                        LoadFile(finalPath)
-                    )
-                )
-                #PrintTree(tree)
-                self.wfile.write(bytes(render(tree, pagename = filename),"utf-8"))
-            elif ext == "css":
-                #print("Sent the css")
-                self.send_header("Content-type", "text/css")
-                self.end_headers()
+        response = Direct(self.path)
 
-                self.wfile.write(bytes(LoadFile(finalPath), "utf-8"))
-            elif ext.lower() in IMAGE_EXT:
-                typ = ""
-                if ext == "png":
-                    typ = "png"
-                elif ext in ["jpg","jpg", "jfif", "pjpeg", "pjp"]:
-                    typ = "jpeg"
-                else:
-                    typ = "gif"
-                self.send_header("Content-type", "image/" + typ)
-                self.end_headers()
+        self.send_response(response["code"])
+        self.send_header(response["hprefix"], response["hcontent"])
+        self.end_headers()
 
-                self.wfile.write(LoadBinary(finalPath))
+        if response["code"] == 200:
+            if response["ext"] == "md":
+                tree = BuildTree(Lexer(LoadFile(response["path"])))
+                self.wfile.write( bytes( render(tree, pagename = response["filename"]) ,"utf-8") )
+            
+            elif response["ext"] == "css":
+                self.wfile.write( bytes(LoadFile(response["path"]), "utf-8") )
             else:
-                self.send_header("Content-type", "text/html")
-                self.end_headers()
+                self.wfile.write( LoadBinary(response["path"]) )
 
-                self.wfile.write(bytes("404 : " + finalPath, "utf-8"))
+def Direct(rpath):
+    currentPath = rpath.replace("%20", " ")     \
+        .replace("%C3%A9", "é") \
+        .replace("%C3%B4", "ô") \
+        .replace("%C3%A8", "è") \
+        .replace("%E9", "é") \
+        .replace("%E8", "è") \
+    
+    response = {
+        "code" : 200,
+        "hprefix" : "Content-type",
+        "hcontent": "text/html",
+        "path" : "./Revisions",
+        "err"  : "",
+        "filename" : "",
+        "ext" : ""
+    }
+    
+    filename, ext = GetFileName(currentPath)
+    response["filename"] = filename
+    response["ext"] = ext 
+    if ext == "css":
+        response["hcontent"] = "text/css"
+        response["path"] = "./wserver/style" + currentPath 
+    elif ext == "png":
+        response["hcontent"] = "image/png"
+        response["path"] = "./Revisions/Média/" + response["filename"] + "." + response["ext"]
+    elif ext == "jpg":
+        response["hcontent"] = "image/jpg"
+        response["path"] = "./Revisions/Média/" + response["filename"] + "." + response["ext"]
+    #add more image type as you go ^^
+    elif ext == "md":
+       #check if file exist
+        if os.path.exists("./Revisions" + currentPath):
+            response["path"] = "./Revisions" + currentPath
+        elif os.path.exists("./Revisions/Cours" + currentPath):
+            response["code"] = 301
+            response["hprefix"] = "Location"
+            response["hcontent"] = "/Cours" + currentPath
+            response["path"] = ""
         else:
-            self.send_header("Content-type", "text/html")
-            self.end_headers()
-
-            self.wfile.write(bytes("404 : Page Not Found sowwy <br>" + currentPath + "<br>","utf-8"))
-            self.wfile.write(bytes(errorMsg,"utf-8"))
-        
+            response["code"] = 404
+            response["err"] = "File " + currentPath + " not found"
+    return response
 
 if __name__ == "__main__":        
     webServer = HTTPServer((hostName, serverPort), MyServer)

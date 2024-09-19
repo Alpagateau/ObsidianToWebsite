@@ -5,10 +5,23 @@ body {
   font-family: hasklig, monospace;
 }
 
+.main {
+  display: flex;
+  flex-direction: row;
+}
+
+.leftc {
+  flex: 2;
+}
+
+.rightc {
+  flex: 2;
+}
+
 .middle {
   background-color: rgb(13 17 23);
   color: white;
-  width: 800px;
+  flex: 3;
   margin: 0 auto;
   padding: 0 20px 20px 20px;
   font-size: larger;
@@ -22,7 +35,6 @@ body {
 }
 
 .middle img {
-  height: 100%;
   width: 100%;
   object-fit: contain;
 }

@@ -4,7 +4,7 @@ cutChars = [".", "`", "*",  "#",
             "-", ">", "=",  "-", 
             "_", "~", "\\", "\n", 
             "$", "[", "]",  "(", ")",
-            "!"] + [i for i in range(10)] 
+            "!", "^"] + [i for i in range(10)] 
 
 #list of special tokens that will be built by the cleanup fonction 
 tokens =[
@@ -16,17 +16,25 @@ tokens =[
     "7.", "8.", "9."]
 
 # Define the regex pattern
-
 table_regex = r"((\|\s([^\n])+)\n)+\n"
 
 opts = (re.MULTILINE | re.DOTALL)
+
 #clean up lexed list by tokenizing it 
 def Cleanup(cln):
     global tokens, table_regex, opts 
+    threshold = 1000
+    
+    #prevent recursion overflow
+    if len(cln) > threshold: 
+        cidx = len(cln)//2
+        while cln[cidx] in cutChars:
+            cidx -= 1
+        return Cleanup(cln[:cidx]) + Cleanup(cln[cidx:])
+
     lexed = cln.copy()
     if lexed == []:
         return []
-    #print(lexed[0])
     if re.search(table_regex,lexed[0]) != None:
         return [lexed[0]] + Cleanup(lexed[1:])
     if lexed[0] in cutChars: 
@@ -38,16 +46,11 @@ def Cleanup(cln):
             return [lexed[0]]+Cleanup(lexed[1:])
         tkn = -1
         l = 0
-        #print(lexed[0], [tokens[i] for i in possibleTokens])
         for i in range(len(possibleTokens)):
             if len(tokens[possibleTokens[i]]) > l:
                 l = len(tokens[possibleTokens[i]])
                 tkn = possibleTokens[i]
-        #print("TOKEN : " + tokens[tkn])
-        #print("len TOKEN : " + str(len(tokens[tkn])))
-        #print(tkn, tokens[tkn],  len(lexed[len(tokens[tkn]):]))
         return [tokens[tkn]] + Cleanup(lexed[len(tokens[tkn]):])
-
     else:
         return [lexed[0]] + Cleanup(lexed[1:])
 

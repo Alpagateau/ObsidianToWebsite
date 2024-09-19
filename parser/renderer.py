@@ -3,20 +3,24 @@ import parser.utils as ut
 
 simpleCor = {
     #"#"     : ("<h1>"   , "</h1>"   ), #cant use this one because it's also used for tags
-    "h2"    : ("<h2>"   , "</h2>"   ),
-    "h3"    : ("<h3>"   , "</h3>"   ),
-    "h4"    : ("<h4>"   , "</h4>"   ),
-    "h5"    : ("<h5>"   , "</h5>"   ),
-    "br"    : ("<br>"   , ""        ),
-    "*"     : ("<i>"    , "</i>"    ),
-    "**"    : ("<b>"    , "</b>"    ),
-    "=="    : ("<mark>" , "</mark>" ),
-    "~~"    : ("<s>"    , "</s>"    ),
-    "$"     : ("\\("    , "\\)"     ),
-    "$$"    : ("\\["    , "\\]"     ),
-    "ls"    : ("<ul>"   , "</ul>"   ),
-    "le"    : ("<li>"   , "</li>"   ),
-    "()"    : ("("      , ")"       ),
+    "h2"    : ("<h2>"        , "</h2>"   ),
+    "h3"    : ("<h3>"        , "</h3>"   ),
+    "h4"    : ("<h4>"        , "</h4>"   ),
+    "h5"    : ("<h5>"        , "</h5>"   ),
+    "br"    : ("<br>"        , ""        ),
+    "*"     : ("<i>"         , "</i>"    ),
+    "**"    : ("<b>"         , "</b>"    ),
+    "=="    : ("<mark>"      , "</mark>" ),
+    "~~"    : ("<s>"         , "</s>"    ),
+    "$"     : ("\\("         , "\\)"     ),
+    "$$"    : ("\\["         , "\\]"     ),
+    "ls"    : ("<ul>"        , "</ul>"   ),
+    "le"    : ("<li>"        , "</li>"   ),
+    "()"    : ("("           , ")"       ),
+    "[]"    : ("["           , "]"       ),
+    "---"   : ("<hr/>"       , ""        ),
+    "^"     : ('<div class="tag">', "</div>"),
+    ">"     : ("<blockquote>", "</blockquote>")
 }
 
 def render(tree, pagename = ""):
@@ -65,13 +69,19 @@ def render(tree, pagename = ""):
                         name += tree.children[0][i]
                     else:
                         adress += tree.children[0][i]
+                if "#" in adress:
+                    adress = adress[ adress.find("#"):]
                 value = "<a href = \"" + adress + ".md\">" + name 
                 footer = "</a>"
                 tree.children = []
             else:
-                value = "<a href=\"" + tree.children[0] + ".md\">" + tree.children[0]
-                footer = "</a>"
-                tree.children = []
+                if "#" in tree.children[0]:
+                    value = "<strong>" + tree.children[0].replace("#", "") + "</strong>"
+                    tree.children = []
+                else:
+                    value = "<a href=\"" + tree.children[0] + ".md\">" + tree.children[0]
+                    footer = "</a>"
+                    tree.children = []
         
         if tree.tag == "![[]]":
             if "|" in tree.children[0]:
@@ -118,7 +128,9 @@ def render(tree, pagename = ""):
         if tree.tag == "wl":
             value = "<a href = \"" + tree.children[0] + "\" >" + tree.children[1] + "</a>"
             tree.children = []
+
         
+
         #table handling 
         if tree.tag == "table":
             headers = tree.children[0].children[0]
