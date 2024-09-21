@@ -9,5 +9,7 @@ iframe {
 }
 
 blockquote {
+  padding: 10px;
+  border-radius: 10px;
   background-color: rgb(22 27 50);
 }

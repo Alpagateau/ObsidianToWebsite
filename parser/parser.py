@@ -201,14 +201,15 @@ def TreeShaker(tree, depth=1):
     
         #Web/external links
         if tree.children[idx].tag == "()":
-            if type(tree.children[idx-1]) != Node:
-                continue
-            if tree.children[idx-1].tag == "[]":
-                nNode = Node("wl") #Web Link 
-                nNode.children = ["".join(tree.children[idx].children), tree.children[idx-1].children[0]]
-                tree.children[idx-1:idx+1] = []
-                tree.children.insert(idx-1, nNode) 
-                continue
+            if type(tree.children[idx-1]) == Node:
+                if tree.children[idx-1].tag == "[]":
+                    nNode = Node("wl") #Web Link 
+                    nNode.children = ["".join(tree.children[idx].children)
+                                      , tree.children[idx-1].children[0]]
+                    tree.children[idx-1:idx+1] = []
+                    tree.children.insert(idx-1, nNode) 
+                    continue
+            
             newList = ["("] + tree.children[idx].children + [")"]
             tree.children.pop(idx)
             for j in range(len(newList)):

@@ -62,6 +62,13 @@ def Direct(rpath):
         response["hcontent"] = "index.md"
         response["ext"] = "md"
         return response 
+    
+    if rpath=="/favicon.ico":
+        response["code"] = 200
+        response["hprefix"] = "Content-type"
+        response["hcontent"] = "image/ico"
+        response["ext"] = "ico"
+        response["path"] = "./wserver/book.ico"
 
     filename, ext = GetFileName(currentPath)
     response["filename"] = filename

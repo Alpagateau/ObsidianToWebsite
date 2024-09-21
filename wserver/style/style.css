@@ -18,6 +18,18 @@ body {
   flex: 3;
 }
 
+@media screen and (max-width : 768px){
+  .leftc {
+    flex: 0;
+    display: none;
+  }
+
+  .rightc {
+    flex: 0;
+    display: none;
+  }
+}
+
 .middle {
   background-color: rgb(13 17 23);
   color: white;
@@ -37,6 +49,10 @@ body {
 .middle img {
   width: 100%;
   object-fit: contain;
+}
+
+.middle a {
+  color : royalblue;
 }
 
 footer{
