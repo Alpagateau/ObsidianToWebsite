@@ -42,7 +42,7 @@ rules = [
     Rule("-",    "-",     "\n" , False, False, "\n"),
     Rule("-_",   "-",     "\n",  False, False, "\t"),
     Rule("-_",   "-",     "\n",  False, False, "    "),
-    Rule(">",    ">",     "\n",   False, False),
+    Rule(">",    ">",     "\n",  False, False),
     Rule("---",  "---",   "\n"),
     Rule("^",    "^",     "\n"),
 ]
