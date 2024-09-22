@@ -2,6 +2,7 @@
 ## this is h2 
 
 this is *italic*, this is **bold** Let's try both. **this is bold and _italic_ but now it is not**. \* just to try. Also, this is inline math $a + b = c$ but this is a math block :
+
 $$
 \sqrt{a + b = c}
 $$
