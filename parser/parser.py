@@ -133,7 +133,10 @@ class Node:
                 if opened != 1:
                     print("PARSING ERROR : " + r.tag + " -> No matching " + r.end) 
                 #print(r.tag + " : Buffer Lenght : " + str(len(buffer)))
-                nNode.addChildren(buffer)
+                if r.canBeNested:
+                    nNode.children += buffer 
+                else: 
+                    nNode.addChildren(buffer)
                 noffset = off+1 
 
         self.children += [nNode]
@@ -188,7 +191,9 @@ def TreeShaker(tree, depth=1):
             buffer = []
             offset = 0
             
-            while type(tree.children[idx-offset]) == Node and tree.children[idx-offset].tag in numerals: 
+            while type(tree.children[idx-offset]) == Node and \
+                tree.children[idx-offset].tag in numerals: 
+ 
                 buffer += [Node("ne", tree.children[idx - offset].children)]
                 offset += 1
                 if idx - offset < 0:
@@ -209,7 +214,10 @@ def TreeShaker(tree, depth=1):
                     tree.children[idx-1:idx+1] = []
                     tree.children.insert(idx-1, nNode) 
                     continue
-            
+           
+            ch = tree.children[idx].children[:]
+            tree.children[idx].children = []
+            tree.children[idx].addChildren(ch)
             newList = ["("] + tree.children[idx].children + [")"]
             tree.children.pop(idx)
             for j in range(len(newList)):
