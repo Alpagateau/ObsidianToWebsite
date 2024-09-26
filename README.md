@@ -40,3 +40,5 @@ Dans le but de rendre le plus fidèlement possible les notes prises avec Obsidia
 A lot still needs to be done. Some of the features i want to add to the websites are :
 1. A graph view (like obsidian)
 2. A file tree, showing all the notes
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/alpa_)
