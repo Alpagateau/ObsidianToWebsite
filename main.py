@@ -4,8 +4,8 @@ from parser.utils import *
 from parser.lexer import *
 from parser.parser import *
 from parser.renderer import *
-import glob
 import os
+import ssl
 
 hostName = "localhost"
 serverPort = 6969
@@ -117,6 +117,7 @@ def Direct(rpath):
     return response
 
 if __name__ == "__main__":        
+    """
     webServer = HTTPServer((hostName, serverPort), MyServer)
     print("Server started http://%s:%s" % (hostName, serverPort))
     try:
@@ -125,3 +126,19 @@ if __name__ == "__main__":
         pass
     webServer.server_close()
     print("Server stopped.")
+    """
+    
+    server_adress = (hostName, serverPort)
+    httpd = HTTPServer(server_adress, MyServer)
+
+    httpd.socket = ssl.wrap_socket(httpd.socker,  certfile='server.crt',keyfile='server.key',server_side=True)
+    
+    print("Server started on https://%s:%s" % (hostName, serverPort))
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        pass 
+    httpd.server_close()
+    print("Server stopped")
+
+
