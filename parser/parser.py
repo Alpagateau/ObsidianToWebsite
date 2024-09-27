@@ -40,8 +40,10 @@ rules = [
     Rule("![",   "![",    "]"  , True),
     Rule("```",  "```",   "```", True),
     Rule("-",    "-",     "\n" , False, False, "\n"),
-    Rule("-_",   "-",     "\n",  False, False, "\t"),
-    Rule("-_",   "-",     "\n",  False, False, "    "),
+    #Rule("s-",   "-",     "\n",  False, False, "\t"),
+    #Rule("s-",   "-",     "\n",  False, False, "    "),
+    Rule("sub",  "\t",    "\n",  False, True),
+    Rule("sub",  "    ",  "\n",  False, True),
     Rule(">",    ">",     "\n",  False, False),
     Rule("---",  "---",   "\n"),
     Rule("^",    "^",     "\n"),
@@ -63,11 +65,12 @@ class Node:
         
         if nlist == []:
             return []
-
-        if re.search(table_regex ,nlist[0]) != None:
-            table_node = parse_table_block(nlist[0])
-            self.children += [table_node]
-            return self.addChildren(nlist[1:], prev=nlist[0][-1])
+        
+        if type(nlist[0]) == str:
+            if re.search(table_regex ,nlist[0]) != None:
+                table_node = parse_table_block(nlist[0])
+                self.children += [table_node]
+                return self.addChildren(nlist[1:], prev=nlist[0][-1])
 
         idx = -1 #rule index 
         noffset = 1 #number of elements to remove before next operation
@@ -133,13 +136,19 @@ class Node:
                 if opened != 1:
                     print("PARSING ERROR : " + r.tag + " -> No matching " + r.end) 
                 #print(r.tag + " : Buffer Lenght : " + str(len(buffer)))
-                if r.canBeNested:
-                    nNode.children += buffer 
-                else: 
-                    nNode.addChildren(buffer)
-                noffset = off+1 
-
-        self.children += [nNode]
+                if r.tag != "sub":
+                    if r.canBeNested:
+                        nNode.children += buffer 
+                    else: 
+                        nNode.addChildren(buffer)
+                    noffset = off+1
+                else:
+                    nNode.addChildren( ["\n"] + buffer + ["\n"] )
+                    self.children[-1].children += nNode.children[:]
+                    nNode = None
+                    noffset = off+1
+        if nNode != None:
+            self.children += [nNode]
         previous = ""
         try:
             previous =  nlist[noffset-1][-1]
@@ -156,6 +165,7 @@ def TreeShaker(tree, depth=1):
     if type(tree) != Node:
         return 
     l = len(tree.children)
+    
     for i in range(l):
         idx = l - i - 1 #use backward index to prevent out of bounds errors 
         
@@ -169,23 +179,32 @@ def TreeShaker(tree, depth=1):
             continue 
         
         #lists
-        if tree.children[idx].tag == "-" or tree.children[idx].tag == "-_":
+        if tree.children[idx].tag == "-":
             buffer = []
             offset = 0
-            t = lambda x : \
-                ( type(tree.children[x]) == Node ) and \
-                ( tree.children[x].tag == "-" or tree.children[x].tag == "-_")
-            
-            while t(idx - offset):
-                buffer += [Node("le",tree.children[idx - offset].children)]
-                offset += 1
+            isN = lambda x : type(tree.children[x]) == Node 
+            work = True 
+            lstList = -1
+            print("This is a list element")
+            while isN(idx-offset) and tree.children[idx-offset].tag in ["-", "br"]:
+                _tag = tree.children[idx-offset].tag
+                if _tag == "-":
+                    n = Node("le",tree.children[idx - offset].children)
+                    buffer += [TreeShaker(n)]
+                    lstList = idx-offset
+                    offset += 1
+                if _tag == "\n":
+                    continue
                 if idx - offset < 0:
                     break
+                offset +=1
             nNode = Node("ls", buffer)
+            print("Hey, i'm here") 
             tree.children[idx-offset+1:idx+1] = []
             tree.children.insert(idx-offset+1, nNode)
-            continue
-        #numbered lists :
+            continue 
+
+        #numbered lists : straight up dont work yet
         numerals =  [str(i) + "." for i in range(10)]
         if tree.children[idx].tag in numerals:
             buffer = []
@@ -266,6 +285,7 @@ def parse_table_block(table_block):
 def BuildTree(lexed):
     tree = Node("page")
     tree.addChildren(lexed)
+    #return tree 
     return TreeShaker(tree)
 
 def PrintTree(n, depth = 0):
