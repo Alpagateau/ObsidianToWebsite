@@ -143,7 +143,7 @@ class Node:
                         nNode.addChildren(buffer)
                     noffset = off+1
                 else:
-                    nNode.addChildren( ["\n"] + buffer + ["\n"] )
+                    nNode.addChildren(["\n"]+buffer)
                     self.children[-1].children += nNode.children[:]
                     nNode = None
                     noffset = off+1
@@ -171,7 +171,7 @@ def TreeShaker(tree, depth=1):
         
         #because of weird deletion thingies, need to recheck the boundaries 
         if idx >= len(tree.children):
-            print("Out of bound area")
+            #print("Out of bound area", idx, tree.tag)
             continue
 
         #ofc, check if string  
@@ -185,21 +185,28 @@ def TreeShaker(tree, depth=1):
             isN = lambda x : type(tree.children[x]) == Node 
             work = True 
             lstList = -1
-            print("This is a list element")
+            #print("This is a list element : ", tree.children[idx].children[0])
             while isN(idx-offset) and tree.children[idx-offset].tag in ["-", "br"]:
-                _tag = tree.children[idx-offset].tag
+                _tag = tree.children[idx-offset].tag 
+                #print("offset", offset)
                 if _tag == "-":
+                    #print("list : ", tree.children[idx-offset].children[0])
                     n = Node("le",tree.children[idx - offset].children)
                     buffer += [TreeShaker(n)]
                     lstList = idx-offset
-                    offset += 1
+                    
                 if _tag == "\n":
+                    offset+=1
                     continue
                 if idx - offset < 0:
                     break
                 offset +=1
-            nNode = Node("ls", buffer)
-            print("Hey, i'm here") 
+            #still just debug info
+            #for i in range(offset+1):
+            #    st = tree.children[idx-i].children[0] if type(tree.children[idx-i]) == Node else tree.children[idx-i]
+            #    print(idx - i, repr(st), type(tree.children[idx-1]))
+            buffer.reverse()
+            nNode = Node("ls", buffer) 
             tree.children[idx-offset+1:idx+1] = []
             tree.children.insert(idx-offset+1, nNode)
             continue 
