@@ -17,7 +17,7 @@ class Rule:
         self.canBeNested = canBeNested
         self.previousChar = prevChar 
 
-table_regex = re.compile(r"((\|\s([^\n])+)\n)+\n",re.MULTILINE)
+table_regex = re.compile(r"([|](.*)+[|]\n)+",re.MULTILINE)
 #       tag   1st c   last c onlyText nested lastChar 
 rules = [
     Rule("h1",   "#",     "\n" , True),
@@ -65,8 +65,9 @@ class Node:
         
         if nlist == []:
             return []
-        
+         
         if type(nlist[0]) == str:
+            #print(nlist[0])
             if re.search(table_regex ,nlist[0]) != None:
                 table_node = parse_table_block(nlist[0])
                 self.children += [table_node]
@@ -252,22 +253,29 @@ def TreeShaker(tree, depth=1):
     
     TreeShaker(tree, depth-1)
     return tree
+
 #this function was made by chatgpt, i apologize... I will rewrite later, but rn i just want it to go in prod 
+# Modifying it on 2024-10-01, ngl it's late, but it's broken... so need to fix it ehhe
+
 def parse_table_block(table_block):
     lines = table_block.strip().split('\n') 
-    
+     
     # Create the root node for the table 
     table_node = Node('table')
     # Create and populate the thead (header)
     thead_node = Node('thead')
     header_row = Node('tr')
-    
+     
     headers = [header.strip() for header in lines[0][1:-1].split('|')]
+    #print("headers", headers)
     alignments = [alignment.strip() for alignment in lines[1][1:-1].split('|')]
-    
+    #print("aligns", alignments) 
     for header, alignment in zip(headers, alignments):
         th_node = Node('th')
-        th_node.addChildren(pl.Lexer(header)) 
+        #print(header)
+        chldrn = pl.Lexer(header)
+        #print("children", chldrn)
+        th_node.addChildren(chldrn) 
         th_node.alignment = alignment  # Store alignment as an attribute 
         header_row.children += [th_node]
     

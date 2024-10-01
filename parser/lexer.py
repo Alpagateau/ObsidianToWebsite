@@ -9,22 +9,22 @@ cutChars = [".", "`", "*",  "#",
 #list of special tokens that will be built by the cleanup fonction 
 tokens =[
     "#", "##", "###", "####", "#####", 
-    "*", "**", "_", "__", "-", "--", 
-    "---", "==", "[", "[[", "]]", "]", "![[",
+    "*", "**", "_", "__", "-", "--", "---", 
+    "==", "[", "[[", "]]", "]", "![[",
     "$$", "$", "`", "```", "\\*", 
     "1.", "2.", "3.", "5.", "6.", "7.",
     "7.", "8.", "9."]
 
 # Define the regex pattern
-table_regex = r"((\|\s([^\n])+)\n)+\n"
-
+old_table_regex = r"((\|\s([^\n])+)\n)+\n"
+table_regex = r"((\|[^\n]+\|)\n)+"
 opts = (re.MULTILINE | re.DOTALL)
 
 #clean up lexed list by tokenizing it 
 def Cleanup(cln):
     global tokens, table_regex, opts 
     threshold = 1000
-    
+     
     #prevent recursion overflow
     if len(cln) > threshold: 
         cidx = len(cln)//2
@@ -56,23 +56,33 @@ def Cleanup(cln):
 
 def Lexer(inputFile):
     global cutChars, table_regex, opts 
+    
+    
     o = []
     buffer = u""
     toParse = [inputFile]
     tables = []
     ls = re.finditer(table_regex, inputFile, re.MULTILINE)
+    if len(inputFile) < 100:
+        print("lexer", inputFile)
 
     for matchNum, match in enumerate(ls, start=1):
+        
         #print("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, 
         #                                                                    start = match.start(), 
         #                                                                    end = match.end(), 
         #                                                                    match = match.group()))
+        if len(inputFile)<100:
+            print(matchNum)
         offset = len("".join(toParse[:-1])) 
         ln = (match.end() - match.start())
         #print(offset, type(match.group()))
         #print(toParse[-1][0:match.start() - offset])
-        toParse = toParse[:-1] + [ toParse[-1][0:match.start()-offset], match.group(), toParse[-1][match.end()-offset:]]
-    
+        toParse = toParse[:-1] + [ 
+            toParse[-1][0:match.start()-offset],
+            match.group(),
+            toParse[-1][match.end()-offset:]]
+     
     for i in range(len(toParse)):
         if re.search(table_regex, toParse[i]) != None:
             o += [toParse[i]]
@@ -85,8 +95,8 @@ def Lexer(inputFile):
                     o += [toParse[i][j]]
                 buffer = u""
             else:
-                buffer += toParse[i][j]
-        
+                buffer += toParse[i][j]    
+        o+=[buffer]
     return Cleanup(o)
 
 

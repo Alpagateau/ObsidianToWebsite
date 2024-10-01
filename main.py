@@ -13,6 +13,7 @@ serverPort = 6969
 
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
+        print("GET is ok")
         response = Direct(self.path)
 
         self.send_response(response["code"])
