@@ -90,7 +90,7 @@ class Node:
         if idx < 0:
             #no rules where met 
             #use for single symbole nodes 
-            print("solo", nlist[0])
+            
             if nlist[0] == "\n":
                 self.children += [Node("br", [""])]
             elif nlist[0] == "[ ]":
