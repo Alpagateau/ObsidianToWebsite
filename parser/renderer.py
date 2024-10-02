@@ -20,7 +20,9 @@ simpleCor = {
     "[]"    : ("["           , "]"       ),
     "---"   : ("<hr/>"       , ""        ),
     "^"     : ('<div class="tag">', "</div>"),
-    ">"     : ("<blockquote>", "</blockquote>")
+    ">"     : ("<blockquote>", "</blockquote>"),
+    "cbu"   : ("<input type=\"checkbox\" disabled value=1/>", ""),
+    "cbc"   : ("<input type=\"checkbox\" disabled checked value=1/>", ""),
 }
 
 def render(tree, pagename = "", minimized = False):

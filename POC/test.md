@@ -1,7 +1,7 @@
 
 this is *italic*, Let's try both.
-- Uno  
-- Due 
+- [x] Uno  
+- [ ] Due 
 - Tre
     - Tre Uno  
     - Tre Due

@@ -89,10 +89,16 @@ class Node:
         #print(nlist[0])
         if idx < 0:
             #no rules where met 
-            if nlist[0] != "\n":
-                self.children += [nlist[0]]
-            else:
+            #use for single symbole nodes 
+            print("solo", nlist[0])
+            if nlist[0] == "\n":
                 self.children += [Node("br", [""])]
+            elif nlist[0] == "[ ]":
+                self.children += [Node("cbu", [""])]
+            elif nlist[0] == "[x]":
+                self.children += [Node("cbc", [""])]
+            else:
+                self.children += [nlist[0]]
             return self.addChildren(nlist[1:], prev=nlist[0])
         
         r = rules[idx]
