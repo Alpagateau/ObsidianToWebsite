@@ -49,15 +49,15 @@ Ici sont les symboles traduits du markdown a l'html :
 
 | Markdown | Html     |
 | -------- | -------- |
-| '#'      | '<h1>'   |
-| '##'     | '<h2>'   |
-| '###'    | '<h3>'   |
-| '####'   | '<h4>'   |
-| '#####'  | '<h5>'   |
-| '\n'     | '<br>'   |
-| '*'      | '<i>'    |
-| '**'     | '<b>'    |
-| '=='     | '<mark>' |
+| `#`      | `<h1>`   |
+| `##`     | `<h2>`   |
+| `###`    | `<h3>`   |
+| `####`   | `<h4>`   |
+| `#####`  | `<h5>`   |
+| `\n`     | `<br>`   |
+| `*`      | `<i>`    |
+| `**`     | `<b>`    |
+| `==`     | `<mark>` |
 
 # Roadmap
 A lot still needs to be done. Some of the features i want to add to the websites are :
