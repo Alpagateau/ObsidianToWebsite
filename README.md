@@ -23,6 +23,10 @@ Ensuite, il suffit de lancer le server :
 ```bash 
 python main.py 
 ```
+## Où trouver le site 
+Actulellement, le site est trouvable [ici](http://mnadaud.fr/index.md). Il est important de noter que le site ne supporte pas encore l'https, et peut donc afficher un message d'erreur si vous essayer de l'ouvrir. 
+Le site est complètement sans danger (si vous ne me croyez pas, regardez le code vous même). 
+
 ## Accès au site local 
 Pour acceder au site, il vous suffit de `Ctrl + Click` sur l'url imprimé par le programme, ou d'ouvrir votre navigateur et d'entrer l'url `http://localhost:6969/index.md`. 
 
@@ -35,6 +39,25 @@ Dans le but de rendre le plus fidèlement possible les notes prises avec Obsidia
 - Mathjax est utilisé pour le rendu des équations
 - highlight.js pour les morceaux de code 
 - Mermaid pour les schémas (a implémenter)
+
+# Comment ça marche 
+Chaque requète est d'abord vérifiée, puis redirigée vers le fichier correspondant. Alors, `lexer.py` découpe le fichier en une liste de symboles sémantiques. Ensuite, le `parser` transforme cette liste en un arbre sémantique (voir [Arbre de syntaxe abstraite](https://en.wikipedia.org/wiki/Abstract_syntax_tree)). 
+Enfin, un `renderer` traduit cet arbre en fichier html lisisble par un moteur de recherche. 
+
+## Table de traduction 
+Ici sont les symboles traduits du markdown a l'html : 
+
+| Markdown | Html     |
+| -------- | -------- |
+| '#'      | '<h1>'   |
+| '##'     | '<h2>'   |
+| '###'    | '<h3>'   |
+| '####'   | '<h4>'   |
+| '#####'  | '<h5>'   |
+| '\n'     | '<br>'   |
+| '*'      | '<i>'    |
+| '**'     | '<b>'    |
+| '=='     | '<mark>' |
 
 # Roadmap
 A lot still needs to be done. Some of the features i want to add to the websites are :

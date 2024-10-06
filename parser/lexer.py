@@ -63,9 +63,6 @@ def Lexer(inputFile):
     toParse = [inputFile]
     tables = []
     ls = re.finditer(table_regex, inputFile, re.MULTILINE)
-    if len(inputFile) < 100:
-        print("lexer", inputFile)
-
     for matchNum, match in enumerate(ls, start=1):
         
         #print("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, 

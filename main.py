@@ -4,7 +4,7 @@ from parser.utils import *
 from parser.lexer import *
 from parser.parser import *
 from parser.renderer import *
-from wserver.search import *
+#from wserver.search import *
 import os
 import ssl
 import sys
@@ -59,11 +59,11 @@ def Direct(rpath):
         "min": False 
     }
 
-    if "?" in currentPath:
-        querry = currentPath.split("?")[-1]
-        response["ext"] = "search"
-        response["filename"] = querry
-        return response
+#    if "?" in currentPath:
+#        querry = currentPath.split("?")[-1]
+#        response["ext"] = "search"
+#        response["filename"] = querry
+#        return response
     if currentPath[-1] == "%":
         response["min"] = True
         currentPath = currentPath[:-1]

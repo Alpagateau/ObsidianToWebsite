@@ -25,6 +25,22 @@ simpleCor = {
     "cbc"   : ("<input type=\"checkbox\" disabled checked value=1/>", ""),
 }
 
+def buildList(current=""):
+    # load cached file list
+    ls = ut.LoadFile("./Cache/filelist.txt")
+    dic = {}
+    ls = ls.split("\n")
+    for i in range(len(ls)):
+        temp = ls[i].split(",")
+        if len(temp) > 1:
+            dic[temp[0]] = temp[1]
+    #build file list html
+    content = "<ul>"
+    for k in dic.keys():
+        content += "<li><a href = \"/" + dic[k] + "\">" + k.replace(".md", "") + "</a></li>"
+    content += "</ul>"
+    return content
+
 def render(tree, pagename = "", minimized = False):
     global simpleCor 
     value = ""
@@ -37,8 +53,10 @@ def render(tree, pagename = "", minimized = False):
                 value = ut.LoadFile("./wserver/minhtml.html")
             footer = value[value.find("¤")+1:] 
             value = value[:value.find("¤")] + "<div class=\"pageTitle\">" + pagename + "</div>"
+            value= value.replace("ߡ", pagename).replace("_sidelist_", buildList())
+            #print(value)
         else:
-            value = tree.tag 
+            value = tree.tag
         
         if tree.tag == "h1":
             if tree.children[0][0] == " ":
@@ -54,12 +72,7 @@ def render(tree, pagename = "", minimized = False):
         if tree.tag == "***":
             value = "<strong><i>"
             footer = "</i></strong>"
-        '''
-        if tree.tag == "bl":
-            value = "<br>"
-        if tree.tag == "bbl":
-            value = "<br><br>"
-        '''
+        
         if tree.tag == "[[]]":
             if "|" in tree.children[0]:
                 #split the name and the url 
