@@ -4,9 +4,11 @@ from parser.utils import *
 from parser.lexer import *
 from parser.parser import *
 from parser.renderer import *
+from wserver.search import *
 import os
 import ssl
 import sys
+from startup import *
 
 hostName = "localhost"
 serverPort = 6969
@@ -32,10 +34,13 @@ class MyServer(BaseHTTPRequestHandler):
 
             elif response["ext"] == "css":
                 self.wfile.write( bytes(LoadFile(response["path"]), "utf-8") )
+            elif response["ext"] == "search":
+                self.wfile.write( bytes(Search(response["filename"]),"utf-8"))
             else:
                 self.wfile.write( LoadBinary(response["path"]) )
 
 def Direct(rpath):
+
     currentPath = rpath.replace("%20", " ")     \
         .replace("%C3%A9", "é") \
         .replace("%C3%B4", "ô") \
@@ -54,6 +59,11 @@ def Direct(rpath):
         "min": False 
     }
 
+    if "?" in currentPath:
+        querry = currentPath.split("?")[-1]
+        response["ext"] = "search"
+        response["filename"] = querry
+        return response
     if currentPath[-1] == "%":
         response["min"] = True
         currentPath = currentPath[:-1]
@@ -119,7 +129,7 @@ def Direct(rpath):
     return response
 
 if __name__ == "__main__":        
-
+    UpdateFileList() 
     webServer = HTTPServer((hostName, serverPort), MyServer)
     print("Server started http://%s:%s" % (hostName, serverPort))
     try:
