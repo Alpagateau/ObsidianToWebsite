@@ -3,7 +3,9 @@ Ce projet a pour objectifs de :
 - proposer une méthode pour traduire du Markdown en HTML 
 - partager des fiches de révisions écrites en Markdown 
 
-Le site étant encore en développement, le server est régulièrement inaccessible, mais, si il est en ligne vous pouvez y acceder[ici](http://5.135.111.214:6969/index.md). 
+
+Le site étant encore en développement, le server est régulièrement inaccessible, mais, si il est en ligne vous pouvez y acceder [ici](https://mnadaud.fr/index.md). 
+Enfin en HTTPS d'ailleur ! 
 
 # Test Local 
 Si le server n'est pas accessible, ou si vous voulez y avoir acces sans internet, il est possible de le lancer en local. 
@@ -24,7 +26,7 @@ Ensuite, il suffit de lancer le server :
 python main.py 
 ```
 ## Où trouver le site 
-Actulellement, le site est trouvable [ici](http://mnadaud.fr/index.md). Il est important de noter que le site ne supporte pas encore l'https, et peut donc afficher un message d'erreur si vous essayer de l'ouvrir. 
+Actulellement, le site est trouvable [ici](https://mnadaud.fr/index.md). Il est important de noter que le site ne supporte pas encore l'https, et peut donc afficher un message d'erreur si vous essayer de l'ouvrir. 
 Le site est complètement sans danger (si vous ne me croyez pas, regardez le code vous même). 
 
 ## Accès au site local 
