@@ -94,6 +94,8 @@ h1,h2,h3,h4,h5 {
 
 .leftc ul {
   list-style-type: none;
+  margin: 0;
+  padding: 0;
 }
 
 .leftc a {
