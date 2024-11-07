@@ -92,6 +92,10 @@ h1,h2,h3,h4,h5 {
   border-radius: 5px;
 }
 
+.leftc ul {
+  list-style-type: none;
+}
+
 .leftc a {
   color: white;
   text-decoration:none;
